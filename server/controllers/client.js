@@ -45,8 +45,8 @@ export const getProducts = async (req, res) => {
             {
                 $lookup: {
                     from: "productstats",  // Tên của collection ProductStatModel trong MongoDB
-                    localField: "_id",      // Trường _id trong ProductModel (kiểu ObjectId)
-                    foreignField: "productId", // Trường productId trong ProductStatModel (kiểu String, sẽ ép kiểu)
+                    localField: "_id.str",      // Trường _id trong ProductModel (kiểu ObjectId) --.str là chuyển string
+                    foreignField: "productId.str", // Trường productId trong ProductStatModel (kiểu String, sẽ ép kiểu)
                     as: "stat"             // Tên của trường chứa kết quả từ ProductStatModel
                 }
             },
@@ -60,7 +60,10 @@ export const getProducts = async (req, res) => {
                     rating: 1,
                     supply: 1,
                     // Trường stat từ ProductStatModel
-                    stat: 1
+                    stat: {
+                        yearlySalesTotal: 1,
+                        yearlyTotalSoldUnits: 1
+                    }
                 }
             }
         ]);
