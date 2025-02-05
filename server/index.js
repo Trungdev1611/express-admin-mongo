@@ -12,7 +12,11 @@ import mongoose from 'mongoose'
 
 //database import data
 import UserModel from './models/User.js'
-import {dataUser} from './data/index.js'
+import ProductModel from './models/Product.js'
+import ProductStatModel from './models/ProductStat.js'
+
+
+import {dataUser, dataProduct, dataProductStat} from './data/index.js'
 
 //Configuration
 dotenv.config()
@@ -38,6 +42,8 @@ mongoose.connect(process.env.MONGO_URL)
     app.listen(PORT, () => console.log(`✅ App running on port: ${PORT} and connect database success`));
     
     //just run once time
-    // UserModel.insertMany(dataUser)
+    // UserModel.insertMany(dataUser) //import data to users database
+    // ProductModel.insertMany(dataProduct)  //import data to products database
+    // ProductStatModel.insertMany(dataProductStat)  //import data to products database
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
