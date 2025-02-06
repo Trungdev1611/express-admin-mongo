@@ -1,5 +1,7 @@
 import ProductModel from "../models/Product.js"
 import ProductStatModel from "../models/ProductStat.js"
+import TransactionModel from "../models/Transaction.js";
+import UserModel from "../models/User.js";
 
 
 export const getProducts = async (req, res) => {
@@ -74,5 +76,61 @@ export const getProducts = async (req, res) => {
         return res.status(200).json(productsWithStats)
     } catch (error) {
         return res.status(400).json({ message: error.message })
+    }
+}
+
+export const getCustomers = async (req, res) => {
+    try {
+        const usersList = await UserModel
+                            .find({role: "user"})
+                            .select("-password")  //get all apart from password field
+        return res.status(200).json(usersList)
+    }
+    catch(error) {
+        console.log("error", error)
+        return res.status(400).json({message: error.message})
+    }
+}
+
+//Transaction have implemented pagination
+//http://localhost:5001/client/transactions?page=1&limit=10&sort={"field": "userId", "sort": "desc"}&search=2001.58
+export const getTransactions = async (req, res) => {
+    try {
+        const query = req.query
+
+        //sort should look like this {"field": "field_need_be_sorted, "sort": "desc"}
+        const {page = 1, pageSize = 20, sort = null, search = "" } = query
+
+        const generateSort = () => {
+            const sortParsed = JSON.parse(sort)
+            const sortFormatted = {
+                [sortParsed.field]: sortParsed.sort === "asc" ? 1 : -1
+            }
+            return sortFormatted
+        }
+
+        const sortFormatted = sort ? generateSort(sort) : {}
+        const searchCondition = search
+        ? {
+              $or: [ // or là tìm kiếm ở một trong các cột
+                //   { field1: { $regex: search, $options: "i" } }, // Tìm kiếm theo field1, nếu có các field khác ta dùng thêm new object
+                    {cost: {$regex: search, $options: "i"}}, //tìm kiếm theo field cost
+                    {userId: {$regex: search, $options: "i"}},
+               
+              ],
+          }
+        : {};
+
+    const transactions = await TransactionModel.find(searchCondition)
+        .sort(sortFormatted)
+        .skip((page - 1) * pageSize)
+        .limit(Number(pageSize));
+
+    const total = await TransactionModel.countDocuments(searchCondition); //total items of documents that correspond with search Conditions
+    console.log("query::::", query)
+    return res.status(200).json({ transactions, total, page, pageSize });
+   
+    } catch (error) {
+        return res.status(400).json({message: error.message})
     }
 }

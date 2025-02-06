@@ -14,9 +14,10 @@ import mongoose from 'mongoose'
 import UserModel from './models/User.js'
 import ProductModel from './models/Product.js'
 import ProductStatModel from './models/ProductStat.js'
+import Transaction from './models/Transaction.js'
 
-
-import {dataUser, dataProduct, dataProductStat} from './data/index.js'
+import {dataUser, dataProduct, dataProductStat, dataTransaction} from './data/index.js'
+import TransactionModel from './models/Transaction.js'
 
 //Configuration
 dotenv.config()
@@ -45,5 +46,6 @@ mongoose.connect(process.env.MONGO_URL)
     // UserModel.insertMany(dataUser) //import data to users database
     // ProductModel.insertMany(dataProduct)  //import data to products database
     // ProductStatModel.insertMany(dataProductStat)  //import data to products database
+    // TransactionModel.insertMany(dataTransaction)
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
